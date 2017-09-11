@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import htmlparser from 'htmlparser2-without-node-native';
 import entities from 'entities';
 
@@ -11,7 +11,7 @@ const defaultOpts = {
   bullet: '\u2022 ',
   TextComponent: Text,
   textComponentProps: null,
-  NodeComponent: Text,
+  NodeComponent: View,
   nodeComponentProps: null,
 };
 
@@ -37,6 +37,8 @@ const Img = props => {
 };
 
 export default function htmlToElement(rawHtml, customOpts = {}, done) {
+
+
   const opts = {
     ...defaultOpts,
     ...customOpts,
@@ -80,6 +82,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             style={[defaultStyle, customStyle]}
           >
             {entities.decodeHTML(node.data)}
+            {opts.lineBreak}
           </TextComponent>
         );
       }
@@ -127,7 +130,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         if (node.name === 'li') {
           const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
           const customStyle = inheritedStyle(parent);
-
+          console.log(node);
           if (parent.name === 'ol') {
             listItemPrefix = (<TextComponent style={[defaultStyle, customStyle]}>
               {`${orderedListCounter++}. `}
@@ -138,6 +141,19 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             </TextComponent>);
           }
           linebreakAfter = opts.lineBreak;
+
+          // return (
+          //   <NodeComponent
+          //     {...opts.nodeComponentProps}
+          //     key={index}
+          //     onPress={linkPressHandler}
+          //     style={!node.parent ? styles[node.name] : null}
+          //     onLongPress={linkLongPressHandler}
+          //   >
+          //     {listItemPrefix}
+          //     {domToElement(node.children, node)}
+          //   </NodeComponent>
+          // );
         }
 
         const {NodeComponent, styles} = opts;
@@ -150,10 +166,8 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             style={!node.parent ? styles[node.name] : null}
             onLongPress={linkLongPressHandler}
           >
-            {linebreakBefore}
             {listItemPrefix}
             {domToElement(node.children, node)}
-            {linebreakAfter}
           </NodeComponent>
         );
       }
