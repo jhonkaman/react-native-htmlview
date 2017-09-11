@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, View} from 'react-native';
 import htmlparser from 'htmlparser2-without-node-native';
 import entities from 'entities';
 
@@ -11,7 +11,7 @@ const defaultOpts = {
   bullet: '\u2022 ',
   TextComponent: Text,
   textComponentProps: null,
-  NodeComponent: Text,
+  NodeComponent: View,
   nodeComponentProps: null,
 };
 
@@ -37,6 +37,42 @@ const Img = props => {
 };
 
 export default function htmlToElement(rawHtml, customOpts = {}, done) {
+  const styles1 = StyleSheet.create({
+
+    column: {
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      width: 280,
+      height: 50, // height: controls overall height of bullet combos
+      flex: -1,
+    },
+
+    row: {
+      flexDirection: 'row',
+      alignItems: 'flex-start',
+      width: 260,
+      //height: 50,
+      //flexWrap: 'wrap',
+      flex: 1,
+      marginBottom: 30,
+    },
+
+    bulletView: {
+      flex: 1,
+      width: 4,
+      marginLeft: 10,
+    },
+
+    bulletTextView: {
+      flex: 1,
+      marginBottom: 70,
+      width: 272,
+      height: 240,
+      marginLeft: -2,
+    },
+
+  });
+
   const opts = {
     ...defaultOpts,
     ...customOpts,
@@ -72,6 +108,23 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
       if (node.type === 'text') {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
+
+        if (parent.name === 'li') {
+          console.log(node);
+
+          return (
+            <View style={styles1.bulletTextView}>
+              <TextComponent
+                {...opts.textComponentProps}
+                key={index}
+                style={[defaultStyle, customStyle]}
+              >
+                {entities.decodeHTML(node.data)}
+                {/* {opts.paragraphBreak} */}
+              </TextComponent>
+            </View>
+          );
+        }
 
         return (
           <TextComponent
@@ -127,17 +180,39 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         if (node.name === 'li') {
           const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
           const customStyle = inheritedStyle(parent);
-
+          //console.log(node);
           if (parent.name === 'ol') {
             listItemPrefix = (<TextComponent style={[defaultStyle, customStyle]}>
               {`${orderedListCounter++}. `}
             </TextComponent>);
           } else if (parent.name === 'ul') {
-            listItemPrefix = (<TextComponent style={[defaultStyle, customStyle]}>
-              {opts.bullet}
-            </TextComponent>);
+            listItemPrefix = (
+                  <TextComponent style={[defaultStyle, customStyle]}>
+                    {opts.bullet}
+                  </TextComponent>
+
+                );
           }
-          linebreakAfter = opts.lineBreak;
+          linebreakAfter =  opts.lineBreak;
+
+          const {NodeComponent, styles} = opts;
+
+          return (
+                  <NodeComponent
+                    {...opts.nodeComponentProps}
+                    key={index}
+                    onPress={linkPressHandler}
+                    style={!node.parent ? styles[node.name] : null}
+                    onLongPress={linkLongPressHandler}
+                  >
+                    <TextComponent>
+                    {linebreakBefore}
+                    {listItemPrefix}
+                    {linebreakAfter}
+                    </TextComponent>
+                    {domToElement(node.children, node)}
+                  </NodeComponent>
+          );
         }
 
         const {NodeComponent, styles} = opts;
@@ -150,10 +225,12 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             style={!node.parent ? styles[node.name] : null}
             onLongPress={linkLongPressHandler}
           >
-            {linebreakBefore}
-            {listItemPrefix}
-            {domToElement(node.children, node)}
-            {linebreakAfter}
+            <TextComponent>
+              {linebreakBefore}
+              {listItemPrefix}
+              {domToElement(node.children, node)}
+              {linebreakAfter}
+            </TextComponent>
           </NodeComponent>
         );
       }
