@@ -218,7 +218,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
 
         const {NodeComponent, styles} = opts;
 
-        if (node.name === 'p' || node.name === 'b') {
+        if (node.name === 'p' || node.name === 'b' || node.name === 'h3') {
         return (
           <TextComponent
             {...opts.nodeComponentProps}
