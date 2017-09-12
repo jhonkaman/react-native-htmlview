@@ -63,6 +63,10 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         marginLeft: 10,
       },
 
+      bullet: {
+        color: 'white',
+      },
+
       bulletTextView: {
         flex: 1,
         marginBottom: 70,
@@ -110,7 +114,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
         const customStyle = inheritedStyle(parent);
 
         if (parent.name === 'li') {
-          console.log(node);
+          //console.log(node);
 
           return (
             <TextComponent
@@ -119,12 +123,12 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               style={[defaultStyle, customStyle]}
             >
               {entities.decodeHTML(node.data)}
-              {/* {opts.lineBreak} */}
+              {opts.lineBreak}
             </TextComponent>
           );
         }
 
-        console.log(node);
+        //console.log(node);
         return (
           <TextComponent
             {...opts.textComponentProps}
@@ -137,6 +141,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
       }
 
       if (node.type === 'tag') {
+        //console.log(node);
         if (node.name === 'img') {
           return <Img key={index} attribs={node.attribs} />;
         }
@@ -187,7 +192,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               {`${orderedListCounter++}. `}
             </TextComponent>);
           } else if (parent.name === 'ul') {
-            listItemPrefix = (<TextComponent style={[defaultStyle, customStyle]}>
+            listItemPrefix = (<TextComponent style={[defaultStyle, customStyle, styles1.bullet]}>
               {opts.bullet}
             </TextComponent>);
           }
@@ -213,6 +218,22 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
 
         const {NodeComponent, styles} = opts;
 
+        if (node.name === 'p' || node.name === 'b') {
+        return (
+          <TextComponent
+            {...opts.nodeComponentProps}
+            key={index}
+            onPress={linkPressHandler}
+            style={!node.parent ? styles[node.name] : null}
+            onLongPress={linkLongPressHandler}
+          >
+            {/* <TextComponent> */}
+            {domToElement(node.children, node)}
+            {/* </TextComponent> */}
+          </TextComponent>
+        );
+      }
+
         return (
           <NodeComponent
             {...opts.nodeComponentProps}
@@ -221,7 +242,6 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             style={!node.parent ? styles[node.name] : null}
             onLongPress={linkLongPressHandler}
           >
-            {listItemPrefix}
             {domToElement(node.children, node)}
           </NodeComponent>
         );
