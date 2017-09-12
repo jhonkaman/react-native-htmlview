@@ -1,9 +1,11 @@
 import React from 'react';
-import {StyleSheet, Text, View} from 'react-native';
+import {StyleSheet, Text, View, Dimensions} from 'react-native';
 import htmlparser from 'htmlparser2-without-node-native';
 import entities from 'entities';
 
 import AutoSizedImage from './AutoSizedImage';
+
+const windowWidth = Dimensions.get('window').width;
 
 const defaultOpts = {
   lineBreak: '\n',
@@ -39,40 +41,17 @@ const Img = props => {
 export default function htmlToElement(rawHtml, customOpts = {}, done) {
   const styles1 = StyleSheet.create({
 
-      column: {
-        flexDirection: 'column',
-        alignItems: 'flex-start',
-        width: 280,
-        height: 50, // height: controls overall height of bullet combos
-        flex: -1,
-      },
-
       row: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        //width: 250,
-        //height: 50,
-        //flexWrap: 'wrap',
-        //flex: 1,
-      //  marginBottom: 30,
-      },
-
-      bulletView: {
         flex: 1,
-        width: 4,
-        marginLeft: 10,
+        width: 0.78 * windowWidth,
+        marginLeft: -3,
       },
 
       bullet: {
         color: 'white',
-      },
-
-      bulletTextView: {
-        flex: 1,
-        marginBottom: 70,
-        width: 272,
-        height: 240,
-        marginLeft: -2,
+        //marginLeft: -2,
       },
 
     });
