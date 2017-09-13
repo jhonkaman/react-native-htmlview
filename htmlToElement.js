@@ -46,12 +46,13 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
           flexDirection: 'row',
           alignItems: 'flex-start',
           flex: 1,
-          width: 0.78 * windowWidth,
-          marginLeft: -3,
+          width: 0.76 * windowWidth,
+          //marginLeft: -3,
         },
 
         bullet: {
           color: 'white',
+          //marginLeft: 2,
         },
 
       });
