@@ -1,9 +1,11 @@
 import React from 'react';
-import {StyleSheet, Text} from 'react-native';
+import {StyleSheet, Text, View, Dimensions} from 'react-native';
 import htmlparser from 'htmlparser2-without-node-native';
 import entities from 'entities';
 
 import AutoSizedImage from './AutoSizedImage';
+
+const windowWidth = Dimensions.get('window').width;
 
 const defaultOpts = {
   lineBreak: '\n',
@@ -13,6 +15,7 @@ const defaultOpts = {
   textComponentProps: null,
   NodeComponent: Text,
   nodeComponentProps: null,
+  ViewComponent: View,
 };
 
 const Img = props => {
@@ -37,6 +40,23 @@ const Img = props => {
 };
 
 export default function htmlToElement(rawHtml, customOpts = {}, done) {
+  const styles1 = StyleSheet.create({
+
+        row: {
+          flexDirection: 'row',
+          alignItems: 'flex-start',
+          flex: 1,
+          width: 0.78 * windowWidth,
+          marginLeft: -3,
+        },
+
+        bullet: {
+          color: 'white',
+        },
+
+      });
+
+
   const opts = {
     ...defaultOpts,
     ...customOpts,
@@ -72,7 +92,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
       if (node.type === 'text') {
         const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
         const customStyle = inheritedStyle(parent);
-
+        console.log(node);
         return (
           <TextComponent
             {...opts.textComponentProps}
@@ -123,6 +143,8 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
           }
         }
 
+        const {NodeComponent, ViewComponent, styles} = opts;
+
         let listItemPrefix = null;
         if (node.name === 'li') {
           const defaultStyle = opts.textComponentProps ? opts.textComponentProps.style : null;
@@ -138,9 +160,38 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
             </TextComponent>);
           }
           linebreakAfter = opts.lineBreak;
+
+          return (
+            <ViewComponent
+              {...opts.nodeComponentProps}
+              key={index}
+              onPress={linkPressHandler}
+              style={!node.parent ? styles[node.name] : null}
+              onLongPress={linkLongPressHandler}
+            >
+              <ViewComponent style={styles1.row}>
+                {listItemPrefix}
+                {domToElement(node.children, node)}
+              </ViewComponent>
+            </ViewComponent>
+          );
         }
 
-        const {NodeComponent, styles} = opts;
+
+
+        if (node.name === 'ul') {
+          return (
+            <ViewComponent
+              {...opts.nodeComponentProps}
+              key={index}
+              onPress={linkPressHandler}
+              style={!node.parent ? styles[node.name] : null}
+              onLongPress={linkLongPressHandler}
+            >
+                {domToElement(node.children, node)}
+            </ViewComponent>
+          );
+        }
 
         return (
           <NodeComponent
