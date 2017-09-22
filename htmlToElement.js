@@ -40,19 +40,17 @@ const Img = props => {
 };
 
 export default function htmlToElement(rawHtml, customOpts = {}, done) {
-  const styles1 = StyleSheet.create({
+  const bulletStyles = StyleSheet.create({
 
         row: {
           flexDirection: 'row',
           alignItems: 'flex-start',
-          flex: 1,
           width: 0.76 * windowWidth,
-          //marginLeft: -3,
+          marginTop: -14,
         },
 
         bullet: {
           color: 'white',
-          //marginLeft: 2,
         },
 
       });
@@ -156,25 +154,25 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               {`${orderedListCounter++}. `}
             </TextComponent>);
           } else if (parent.name === 'ul') {
-            listItemPrefix = (<TextComponent style={[defaultStyle, customStyle]}>
+            listItemPrefix = (<TextComponent style={[defaultStyle, customStyle, bulletStyles.bullet]}>
               {opts.bullet}
             </TextComponent>);
           }
           linebreakAfter = opts.lineBreak;
 
           return (
-            <ViewComponent
-              {...opts.nodeComponentProps}
-              key={index}
-              onPress={linkPressHandler}
-              style={!node.parent ? styles[node.name] : null}
-              onLongPress={linkLongPressHandler}
-            >
-              <ViewComponent style={styles1.row}>
+            // <ViewComponent
+            //   {...opts.nodeComponentProps}
+            //   key={index}
+            //   onPress={linkPressHandler}
+            //   style={!node.parent ? styles[node.name] : null}
+            //   onLongPress={linkLongPressHandler}
+            // >
+              <ViewComponent style={bulletStyles.row}>
                 {listItemPrefix}
                 {domToElement(node.children, node)}
               </ViewComponent>
-            </ViewComponent>
+            //</ViewComponent>
           );
         }
 
@@ -189,7 +187,7 @@ export default function htmlToElement(rawHtml, customOpts = {}, done) {
               style={!node.parent ? styles[node.name] : null}
               onLongPress={linkLongPressHandler}
             >
-                {domToElement(node.children, node)}
+              {domToElement(node.children, node)}
             </ViewComponent>
           );
         }
